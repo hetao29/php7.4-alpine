@@ -1,0 +1,77 @@
+proxy_cache_path /data/cache/www levels=1:2 keys_zone=www:5000m inactive=1h max_size=20000m;
+server {
+	listen 80 default_server;
+	add_header Strict-Transport-Security "max-age=31536000; includeSubdomains";
+	add_header X-Frame-Options SAMEORIGIN;
+
+	root /data/www/www;
+
+	index  index.php;
+	# Make site accessible from http://localhost/
+	#access_log /data/log/nginx_access.www.log main;
+	access_log off;
+
+    listen 443 ssl http2; 
+	ssl_certificate			/data/www/keys/mxiqi.com.v1.pem;
+	ssl_certificate_key		/data/www/keys/mxiqi.com.v1.key;
+	ssl_session_timeout 5m;
+	ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+	ssl_prefer_server_ciphers on;
+
+	location / {
+		proxy_pass http://127.0.0.1:91/;
+
+		proxy_http_version 1.1;
+		proxy_set_header Connection "";
+		proxy_cache_methods  GET HEAD POST;
+
+		add_header X-Backend-Server $hostname;
+		add_header X-Cache-Status $upstream_cache_status;
+		proxy_set_header Host      $host;
+		proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_cache www;
+		proxy_no_cache $arg_ykcache;
+		proxy_cache_revalidate on;
+		proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+		proxy_cache_key "$scheme$host$uri|$is_args|$args|$request_method|$request_body|$cookie_language";
+
+	}
+	location ~* \/(assets|assets_v2) {
+		add_header X-Cache-Status $upstream_cache_status;
+		proxy_pass http://127.0.0.1:91;
+		proxy_cache_valid 200 1h;
+		expires 604800;
+		proxy_cache www;
+		proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+		proxy_cache_key "$scheme$host$uri|$is_args|$args|$cookie_language";
+	}
+}
+
+server {
+	listen 127.0.0.1:91;
+
+	root /data/www/www;
+
+	index  index.php;
+	access_log off;
+	location / {
+		root   /data/www/www;
+		index  index.php;
+		if (!-e $request_filename){
+			rewrite ^/(.+?)$ /index.php last;
+		}
+	}
+	location = /empty.gif {
+		empty_gif;
+	}
+	location ~ \.php$ {
+		fastcgi_param REMOTE_ADDR $http_x_real_ip;
+		fastcgi_pass   127.0.0.1:9000;
+		fastcgi_index  index.php;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		include        fastcgi_params;
+	}
+
+}
+
