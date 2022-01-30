@@ -6,7 +6,7 @@
 
 ## extension
 1. imap mbstring ldap redis mcrypt ldap mysql bcmath curl gd iconv openssl imagick zip ftp pcntl sockets exif
-2. grpc swoole of pecl
+2. grpc swoole
 
 ## dir
 ### site root
