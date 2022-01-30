@@ -20,7 +20,7 @@ RUN pecl install -D 'enable-http2="yes" enable-openssl="yes"'  swoole
 
 
 #mkdir default config
-RUN mkdir -p /data/www \
+RUN mkdir -p /data/www/www \
     && cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak \
     && cp /etc/php7/php.ini /etc/php7/php.ini.bak \
     && cp /etc/php7/php-fpm.conf  /etc/php7/php-fpm.conf.bak \
@@ -36,12 +36,12 @@ COPY docker/fpm/php-fpm.conf /etc/php7/php-fpm.conf
 COPY docker/fpm/pool.d/www.conf /etc/php7/php-fpm.d/www.conf
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && ln -sf /dev/stderr /var/log/nginx/error.log
 
-COPY index.php .
+COPY index.php www/
 
 RUN php -m
 
 #代码检查
-RUN find app -type f -name '*.php' -exec php -l {} \; | (! grep -v "No syntax errors detected" )
+RUN find . -type f -name '*.php' -exec php -l {} \; | (! grep -v "No syntax errors detected" )
 
 HEALTHCHECK --interval=5s --timeout=5s --retries=3 \
     CMD ps aux | grep "php-fpm:" | grep -v "grep" > /dev/null; if [ 0 != $? ]; then exit 1; fi
