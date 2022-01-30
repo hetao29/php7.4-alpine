@@ -1,15 +1,31 @@
 # php7.4-alpine
 
 ## nginx
-1. with nginx
+1. nginx
 
 
 ## extension
-1. with imap mbstring ldap redis mcrypt ldap mysql bcmath curl gd iconv openssl imagick zip ftp pcntl sockets exif
-2. with grpc swoole of pecl
+1. imap mbstring ldap redis mcrypt ldap mysql bcmath curl gd iconv openssl imagick zip ftp pcntl sockets exif
+2. grpc swoole of pecl
 
 ## dir
-1. /data/www/www the site root 
-2. /etc/php7/php.ini php config root
-3. /etc/php7/php-fpm.conf and /etc/php7/php-fpm.d/ the php-fpm config root
-5. /etc/nginx/sites-enabled/ nginx config root
+### site root
+```bash
+/data/www/www
+```
+
+### php config
+```bash
+/etc/php7/php.ini
+```
+
+### php-fpm config
+```bash
+/etc/php7/php-fpm.conf 
+/etc/php7/php-fpm.d/www.conf
+```
+### nginx config
+```bash
+/etc/nginx/nginx.conf
+/etc/nginx/sites-enabled/www
+```
