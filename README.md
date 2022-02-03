@@ -1,8 +1,17 @@
 # php7.4-alpine
 
+## usage
+
+```dockerfile
+FROM hetao29/php7.4-alpine
+WORKDIR /data/www/
+
+COPY index.php ./
+
+```
+
 ## nginx
 1. nginx
-
 
 ## extension
 1. imap mbstring ldap redis mcrypt ldap mysql bcmath curl gd iconv openssl imagick zip ftp pcntl sockets exif
